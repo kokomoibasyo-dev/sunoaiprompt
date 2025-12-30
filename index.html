@@ -18,10 +18,7 @@ body{
   margin:auto;
   padding:24px;
 }
-h1{
-  color:var(--red);
-  letter-spacing:1px;
-}
+h1{color:var(--red);}
 h2{
   color:var(--yellow);
   border-left:4px solid var(--red);
@@ -37,9 +34,7 @@ button.option{
   margin:4px;
   cursor:pointer;
 }
-button.option.active{
-  background:var(--red);
-}
+button.option.active{background:var(--red);}
 button.create{
   background:var(--yellow);
   color:#000;
@@ -47,7 +42,6 @@ button.create{
   padding:14px 24px;
   border:none;
   cursor:pointer;
-  margin-top:20px;
 }
 button.copy{
   background:var(--red);
@@ -60,12 +54,11 @@ button.copy{
 }
 textarea{
   width:100%;
-  height:140px;
+  height:120px;
   background:#000;
   color:#0f0;
   border:1px solid #333;
   padding:10px;
-  margin-top:6px;
   font-family: monospace;
 }
 small{color:#aaa;}
@@ -75,20 +68,21 @@ small{color:#aaa;}
 <body>
 
 <h1>NERV / Suno プロンプト生成システム</h1>
-<small>用途特化・SEO前提・失敗しないBGM設計</small>
+<small>SEO × 用途特化 × 失敗しないBGM設計</small>
 
+<!-- プリセット -->
 <div class="group">
-<h2>使用プラットフォーム</h2>
-<button class="option" data-platform="Gumroad">Gumroad</button>
-<button class="option" data-platform="YouTube">YouTube</button>
-<button class="option" data-platform="Both">両方</button>
+<h2>用途プリセット</h2>
+<button class="option" data-preset="education">🎓 教育</button>
+<button class="option" data-preset="explainer">🧠 解説</button>
+<button class="option" data-preset="business">🏢 企業</button>
 </div>
 
 <div class="group">
 <h2>主な用途</h2>
-<button class="option" data-use="narration">ナレーション付き動画</button>
-<button class="option" data-use="focus">作業・集中用</button>
-<button class="option" data-use="short videos">Short動画</button>
+<button class="option" data-use="educational videos">教育動画</button>
+<button class="option" data-use="explainer videos">解説動画</button>
+<button class="option" data-use="corporate videos">企業動画</button>
 </div>
 
 <div class="group">
@@ -106,13 +100,6 @@ small{color:#aaa;}
 </div>
 
 <div class="group">
-<h2>トーン</h2>
-<button class="option" data-tone="neutral">ニュートラル</button>
-<button class="option" data-tone="warm">温かい</button>
-<button class="option" data-tone="cool">クール</button>
-</div>
-
-<div class="group">
 <h2>概要文の言語</h2>
 <button class="option" data-lang="en">英語</button>
 <button class="option" data-lang="jp">日本語</button>
@@ -120,21 +107,25 @@ small{color:#aaa;}
 
 <button class="create" onclick="createAll()">生成する</button>
 
+<!-- SEO -->
+<h2>SEOキーワード</h2>
+<button class="copy" onclick="copyText('seo')">コピー</button>
+<textarea id="seo"></textarea>
+
+<!-- Suno -->
 <h2>Suno用プロンプト</h2>
 <button class="copy" onclick="copyText('suno')">コピー</button>
 <textarea id="suno"></textarea>
 
+<!-- Title -->
 <h2>SEOタイトル</h2>
 <button class="copy" onclick="copyText('title')">コピー</button>
 <textarea id="title"></textarea>
 
+<!-- Description -->
 <h2>SEO概要文</h2>
 <button class="copy" onclick="copyText('desc')">コピー</button>
 <textarea id="desc"></textarea>
-
-<h2>トラック名（連番）</h2>
-<button class="copy" onclick="copyText('tracks')">コピー</button>
-<textarea id="tracks"></textarea>
 
 <script>
 let state={};
@@ -149,38 +140,54 @@ document.querySelectorAll('.option').forEach(btn=>{
 });
 
 function createAll(){
-  const u=state.use||"narration";
-  const s=state.stim||"low";
-  const l=state.length||"2 minutes";
-  const t=state.tone||"neutral";
+  const preset=state.preset||"explainer";
+  const use=state.use||"explainer videos";
+  const stim=state.stim||"low";
+  const len=state.length||"2 minutes";
   const lang=state.lang||"en";
 
+  const keywordMap={
+    education:{
+      primary:"educational background music",
+      secondary:"background music for learning videos",
+      longtail:"background music for educational explainer videos"
+    },
+    explainer:{
+      primary:"narration safe background music",
+      secondary:"background music for explainer videos",
+      longtail:"background music for voice over videos"
+    },
+    business:{
+      primary:"corporate background music",
+      secondary:"background music for business videos",
+      longtail:"background music for professional presentations"
+    }
+  };
+
+  const k=keywordMap[preset];
+
+  document.getElementById("seo").value=
+`Primary: ${k.primary}
+Secondary: ${k.secondary}
+Long-tail: ${k.longtail}`;
+
   document.getElementById("suno").value=
-`Ambient background music designed not to interfere with ${u}.
-Minimal melody, ${s} stimulation.
+`Ambient background music designed not to interfere with ${use}.
+Minimal melody, ${stim} stimulation.
 No vocals, no strong rhythm.
-${t} tone.
-Safe for professional content.
-Duration: ${l}.`;
+Neutral tone.
+Safe for professional use.
+Duration: ${len}.`;
 
   document.getElementById("title").value=
-`Narration-Safe Background Music for ${u} (${l})`;
+`${k.primary} for ${use} (${len})`;
 
   document.getElementById("desc").value=
 lang==="jp"
-?`このBGMは${u}用途向けに設計されています。
-音声や字幕、テキストを邪魔しない安全な背景音です。
-商用利用可。クレジット表記は任意です。`
-:`This background music is designed for ${u}.
-It stays behind voice and text, reducing audio conflicts.
-Commercial use allowed. Credit optional.`;
-
-  document.getElementById("tracks").value=
-`${u}_safe_bg_01
-${u}_safe_bg_02
-${u}_safe_bg_03
-${u}_safe_bg_04
-${u}_safe_bg_05`;
+?`このBGMは${use}向けに設計されています。
+音声や字幕を邪魔しない、安全で実務向けの背景音です。`
+:`This background music is designed for ${use}.
+It stays behind voice and text and avoids audio interference.`;
 }
 
 function copyText(id){
